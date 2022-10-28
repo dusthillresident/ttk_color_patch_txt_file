@@ -1,0 +1,76 @@
+diff -Naur tk-755608c3/library/palette.tcl tk-755608c3_myedits/library/palette.tcl
+--- tk-755608c3/library/palette.tcl	2022-10-27 17:13:47.000000000 +0100
++++ tk-755608c3_myedits/library/palette.tcl	2022-10-28 11:58:22.202858564 +0100
+@@ -71,6 +71,20 @@
+     if {![info exists new(highlightBackground)]} {
+ 	set new(highlightBackground) $new(background)
+     }
++    # 'buttonBackground' is the background color of the buttons in
++    # the spinbox widget.
++    if {![info exists new(buttonBackground)]} {
++	set new(buttonBackground) $new(background)
++    }
++    # 'selectColor' is the background of check & radio buttons.
++    if {![info exists new(selectColor)]} {
++	foreach {r g b} $bg {break}
++	if {$r+1.5*$g+0.5*$b > 100000} {
++	    set new(selectColor) white
++	} else {
++	    set new(selectColor) black
++	}
++    }
+     if {![info exists new(activeBackground)]} {
+ 	# Pick a default active background that islighter than the
+ 	# normal background.  To do this, round each color component
+diff -Naur tk-755608c3/library/ttk/defaults.tcl tk-755608c3_myedits/library/ttk/defaults.tcl
+--- tk-755608c3/library/ttk/defaults.tcl	2022-10-27 17:13:47.000000000 +0100
++++ tk-755608c3_myedits/library/ttk/defaults.tcl	2022-10-28 12:04:24.687148636 +0100
+@@ -29,6 +29,7 @@
+                  { {	background		Background		}
+                  {	foreground		Foreground		}
+                  {	background		Background		}
++                 {	background		Background		}
+                  {	foreground		Foreground		}
+                  {	activeBackground	ActiveBackground	}
+                  {	selectBackground	SelectBackground	}
+@@ -40,7 +41,7 @@
+                  {	selectBackground	SelectBackground	}
+                  {	troughColor		TroughColor		} }\
+ 	    colorName\
+-                 { -frame -foreground -window -text
++                 { -frame -foreground -window -alternate -text
+                  -activebg -selectbg -selectfg
+                  -darker -disabledfg -indicator
+                  -disabledindicator -altindicator
+@@ -58,7 +59,7 @@
+     # to the ttk widgets.
+     variable colorOptionLookup
+     array set colorOptionLookup {
+-	background		{-frame -window}
++	background		{-frame -window -alternate}
+ 	foreground		{-foreground -text}
+ 	activeBackground	-activebg
+ 	selectBackground	{-selectbg -indicator -altindicator}
+@@ -137,12 +138,12 @@
+ 
+ 	ttk::style configure TCombobox -arrowsize 12 -padding 1
+ 	ttk::style map TCombobox -fieldbackground \
+-	    [list readonly $colors(-frame) disabled $colors(-frame)] \
++	    [list readonly $colors(-frame) disabled $colors(-frame) !disabled $colors(-window)] \
+ 	    -arrowcolor [list disabled $colors(-disabledfg) !disabled $colors(-text)]
+ 
+ 	ttk::style configure TSpinbox -arrowsize 10 -padding {2 0 10 0}
+ 	ttk::style map TSpinbox -fieldbackground \
+-	    [list readonly $colors(-frame) disabled $colors(-frame)] \
++	    [list readonly $colors(-frame) disabled $colors(-frame) !disabled $colors(-window)] \
+ 	    -arrowcolor [list disabled $colors(-disabledfg) !disabled $colors(-text)]
+ 
+ 	ttk::style configure TLabelframe \
+@@ -169,6 +170,7 @@
+ 	ttk::style configure Treeview \
+             -background $colors(-window) \
+             -stripedbackground $colors(-alternate) \
++	    -fieldbackground $colors(-window) \
+ 	    -foreground $colors(-text) ;
+ 	ttk::style configure Treeview.Separator \
+                 -background $colors(-alternate)
